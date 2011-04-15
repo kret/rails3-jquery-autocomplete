@@ -94,6 +94,7 @@ module Rails3JQueryAutocomplete
       options = parameters[:options]
       term = parameters[:term]
       is_full_search = options[:full]
+      is_or_search = !options[:or_fields].blank?
 
       limit = get_autocomplete_limit(options)
       implementation = get_implementation(model)
@@ -104,9 +105,17 @@ module Rails3JQueryAutocomplete
           search = (is_full_search ? '.*' : '^') + term + '.*'
           items = model.where(method.to_sym => /#{search}/i).limit(limit).order_by(order)
         when :activerecord
-          relation = model.select([:id, method] + (options[:extra_data].blank? ? [] : options[:extra_data])) unless options[:full_model]
-          items = relation.where(["LOWER(#{method}) LIKE ?", "#{(is_full_search ? '%' : '')}#{term.downcase}%"]) \
-            .limit(limit).order(order)
+          if is_or_search
+            where_conditions = "LOWER(#{method}) LIKE :term_value"
+            options[:or_fields].each do |of|
+              where_conditions += " OR LOWER(#{of}) LIKE :term_value"
+            end
+            relation = model.select([:id] + options[:or_fields] + (options[:extra_data].blank? ? [] : options[:extra_data])) unless options[:full_model]
+            items = relation.where([where_conditions, { :term_value => "#{(is_full_search ? '%' : '')}#{term.downcase}%" }]).limit(limit).order(order)
+          else
+            relation = model.select([:id, method] + (options[:extra_data].blank? ? [] : options[:extra_data])) unless options[:full_model]
+            items = relation.where(["LOWER(#{method}) LIKE ?", "#{(is_full_search ? '%' : '')}#{term.downcase}%"]) \
+              .limit(limit).order(order)
       end
     end
   end
