@@ -110,7 +110,7 @@ module Rails3JQueryAutocomplete
             options[:or_fields].each do |of|
               where_conditions += " OR LOWER(#{of}) LIKE :term_value"
             end
-            relation = model.select([:id] + options[:or_fields] + (options[:extra_data].blank? ? [] : options[:extra_data])) unless options[:full_model]
+            relation = model.select([:id, method] + options[:or_fields] + (options[:extra_data].blank? ? [] : options[:extra_data])) unless options[:full_model]
             items = relation.where([where_conditions, { :term_value => "#{(is_full_search ? '%' : '')}#{term.downcase}%" }]).limit(limit).order(order)
           else
             relation = model.select([:id, method] + (options[:extra_data].blank? ? [] : options[:extra_data])) unless options[:full_model]
