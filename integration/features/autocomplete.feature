@@ -3,12 +3,14 @@ Feature: Autocomplete
   As a User
   I want autocomplete!
 
-  Background: 
+  Background:
     Given the following brands exists:
-      | name  |
-      | Alpha |
-      | Beta  |
-      | Gamma |
+      | name    | state |
+      | Alpha   | true  |
+      | Beta    | false |
+      | Gamma   | false |
+      | Kappa   | true  |
+      | Kappler | false |
     And the following features exists:
       | name  |
       | Shiny |
@@ -62,3 +64,10 @@ Feature: Autocomplete
     And I choose "Alpha" in the autocomplete list
     Then the "Brand name" field should contain "Alpha"
 
+  @javascript
+  Scenario: Autocomplete with scope
+    Given the "Kappa" brand has an address
+    Given I go to the new scoped autocomplete page
+    And I fill in "Brand name" with "ka"
+    And I choose "Kappa" in the autocomplete list
+    Then the "Brand name" field should contain "Kappa"

@@ -12,12 +12,13 @@ Gem::Specification.new do |s|
   s.summary = %q{Use jQuery's autocomplete plugin with Rails 3.}
   s.description = %q{Use jQuery's autocomplete plugin with Rails 3.}
 
-  s.add_dependency('rails', '~>3.0.0')
+  s.add_dependency('rails', '~>3.0')
   s.add_dependency('yajl-ruby')
 
   s.add_development_dependency('sqlite3-ruby')
-  s.add_development_dependency('mongoid', '>= 2.0.0.rc.7')
-  s.add_development_dependency('bson_ext', '~>1.2.4')
+  s.add_development_dependency('mongoid', '>= 2.0.0')
+  s.add_development_dependency('mongo_mapper', '>= 0.9')
+  s.add_development_dependency('bson_ext', '~>1.3.0')
   s.add_development_dependency('shoulda', '~>2.11.1')
 
   s.files         = `git ls-files`.split("\n")

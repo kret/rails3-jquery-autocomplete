@@ -2,7 +2,7 @@
 
 An easy way to use jQuery's autocomplete with Rails 3.
 
-Supports both ActiveRecord and [mongoid](http://github.com/mongoid/mongoid).
+Supports both ActiveRecord, [mongoid](http://github.com/mongoid/mongoid), and [MongoMapper](https://github.com/jnunemaker/mongomapper).
 
 Works with [Formtastic](http://github.com/justinfrench/formtastic)
 and [SimpleForm](https://github.com/plataformatec/simple_form)
@@ -16,6 +16,10 @@ on how to use this gem with ActiveRecord [here](http://github.com/crowdint/rails
 
 You can find a [detailed example](http://github.com/crowdint/rails3-jquery-autocomplete-app/tree/mongoid)
 on how to use this gem with MongoID [here](http://github.com/crowdint/rails3-jquery-autocomplete-app/tree/mongoid). (Same thing, different branch)
+
+## MongoMapper
+
+TODO
 
 ## Before you start
 
@@ -139,6 +143,15 @@ This wouldn't really make much sense unless you use it with the :id_element HTML
 
 Only the object's id and the column you are searching on will be returned in JSON, so if your display_value method requires another parameter, make sure to fetch it with the :extra_data option
 
+
+#### :scopes
+  Added option to use scopes. Pass scopes in an array.
+  e.g `:scopes => [:scope1, :scope2]`
+
+#### :column_name
+   By default autocomplete uses method name as column name. Now it can be specified using column_name options
+   `:column_name => 'name'`
+
 ### View
 
 On your view, all you have to do is include the attribute autocomplete on the text field
@@ -194,7 +207,7 @@ A javascript event named *railsAutocomplete.select* is fired on the input field 
 If you are using [Formtastic](http://github.com/justinfrench/formtastic), you automatically get the *autocompleted_input* helper on *semantic_form_for*:
 
     semantic_form_for @product do |f|
-      f.autocompleted_input :brand_name, :url => autocomplete_brand_name_path
+      f.autocompleted_input :brand_name, :url => autocomplete_brand_name_products_path
     end
 
 The only difference with the original helper is that you must specify the autocomplete url using the *:url* option.
@@ -236,6 +249,35 @@ An example on how to use it:
 
 I have only tested this using Capybara, no idea if it works with something else, to see it in action, check the [example app](http://github.com/crowdint/rails3-jquery-autocomplete-app).
 
+# Steak
+
+I have created a helper to test your autocomplete with Steak and Capybara, all you have to do is add the following lines to your *acceptance_helper.rb* file:
+
+    require 'steak/autocomplete'
+
+Then you'll have access to the following helper:
+
+    choose_autocomplete_result
+
+An example on how to use it:
+
+    scenario "Autocomplete" do
+      lambda do 
+        Brand.create! [
+          {:name => "Alpha"}, 
+          {:name => "Beta"},
+          {:name => "Gamma"}
+        ]
+      end.should change(Brand, :count).by(3)
+
+      visit home_page
+      fill_in "Brand name", :with => "al"
+      choose_autocomplete_result "Alpha"
+      find_field("Brand name").value.should include("Alpha")
+    end
+
+I have only tested this using Capybara, no idea if it works with something else.
+
 # Development
 
 If you want to make changes to the gem, first install bundler 1.0.0:
@@ -263,10 +305,18 @@ You can run the integration tests with the cucumber command while on the
 integration folder:
 
     cd integration
+    rake db:migrate
     cucumber
 
 # Changelog
 
+* 0.7.4 Allows Rails 3.1
+* 0.7.3 MongoMapper
+* 0.7.2 Steak helper
+* 0.7.1 Fixed joined scopes (Issue #43)
+* 0.7.0 Scopes
+* 0.6.6 ILIKE for postgres
+* 0.6.5 JS select event
 * 0.6.4 Use YAJL instead of JSON
 * 0.6.3 SimpleForm plugin
 * 0.6.2 Fix Issue #8
@@ -286,3 +336,4 @@ Everyone on [this list](https://github.com/crowdint/rails3-jquery-autocomplete/c
 [Crowd Interactive](http://www.crowdint.com) is an American web design and development company that happens to work in Colima, Mexico.
 We specialize in building and growing online retail stores. We don’t work with everyone – just companies we believe in. Call us today to see if there’s a fit.
 Find more info [here](http://www.crowdint.com)!
+

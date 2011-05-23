@@ -1,14 +1,10 @@
 module Rails3JQueryAutocomplete
   module TestCase
-    module Mongoid
+    module MongoMapper
       def setup
-        ::Mongoid.configure do |config|
-          name = "rails3_jquery_autocomplete_test"
-          host = "localhost"
-          config.master = Mongo::Connection.new.db(name)
-          config.logger = nil
-        end
-
+        ::MongoMapper.connection = Mongo::Connection.new('localhost', 27017)
+        ::MongoMapper.database = "rails3_jquery_autocomplete_test"
+        
         create_models
 
         @controller = ActorsController.new
@@ -19,14 +15,14 @@ module Rails3JQueryAutocomplete
 
       def teardown
         destroy_models
-        ::Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:drop)
+        ::MongoMapper.database.collections.select {|c| c.name !~ /system/ }.each(&:drop)
       end
 
       private
       def create_models
         @movie_class = Object.const_set(:Movie, Class.new)
-        @movie_class.send(:include, ::Mongoid::Document)
-        @movie_class.field(:name, :class => String)
+        @movie_class.send(:include, ::MongoMapper::Document)
+        @movie_class.key(:name, :class => String)
         @movie_class.class_eval do
           def display_name
             "Movie: #{name}"
